@@ -76,7 +76,6 @@
 7. 对数组的基本操作就是用[ ]确定下标。在像数组或vector这样的集合中，依序访问没一个元素的格式是必不可少的操作。C++11在语法中添加了**范围for语句（range for)**
 
 ```cpp
-
 int sum = 0;
 for (int i = 0; i < squares.size(); ++i)
     sum += squares[i];
@@ -270,8 +269,6 @@ for (auto x: squares)
     }
    ```
 
-   
-
 ### 1.5.6 五大函数：析构函数、拷贝构造函数、移动构造函数、拷贝复制operator=、移动复制operator=
 
 1. 析构函数——只要一个对象运行越出范围，或经受一次**delete** ，则析构函数就要被调用。典型情况下，析构函数的唯一责任就是释放掉在对象使用期间获得的资源，包括关于任意的**new** 操作调用对应的**delete** ，关闭任何打开的文件，等等。默认做法是对每个数据成员应用析构函数。
@@ -299,7 +296,6 @@ for (auto x: squares)
 8. 作为一般法则，接受对所有5种操作的默认处理，或声明并显式定义所有5个函数的默认情形（使用关键字default），或每个都不予接受(使用关键字delete)
 
 ```cpp
-
 // 再次显式地列出拷贝和移动操作
 ~IntCell()  {cout << "Invoking destructor" << endl;}    // 析构函数
 IntCell（const IntCell & rhs) = default;                // 拷贝构造函数
@@ -518,8 +514,6 @@ delete[] arr2;
    }
    ```
 
-  
-
 ### 1.6.4 函数对象
 
 1. 模板有一个重要的局限：它支队那些定义了operator<函数的对象有效，
@@ -533,11 +527,6 @@ delete[] arr2;
 5. 不是使用带有名字的函数，而是使用运算符重载。不是使用作为函数的isLessThan方法，而是使用operator()。其次，当调用operator时，cmp.operator()(x,y)可以简写成cmp(x,y)[换句话说，看起来像是函数调用，因而operator()被称为**函数调用操作符（function call operator）** ]。结果，参数名可以改成更有意义的isLessThan, 而调用则是isLessThan(x,y)。再次，提供一个不用函数对象就能工作的findMax版本，实现用到标准库函数对象模板less(定义于头文件functional中)以生成一个强制使用正常默认顺序的函数对象
 
 ```cpp
-
-```
-
-```cpp
-
 // 泛型findMax, 带有一个函数对象，vector #1
 // 前提：a.size() > 0
 template<typename Object, typename Comparator>
@@ -609,5 +598,89 @@ int main()
     return 0;
 }
 ```
+
+### 1.6.5  类模板的分离式编译
+
+## 1.7  使用矩阵
+
+1. 二维数组，一般称之为矩阵（matrix）
+
+2. C++不提供matrix类。但可以写。基本思路是使用一些向量的向量来完成
+
+3. 为其定义operator[ ], 即数组下标运算符(array-indexing operator)
+   
+   ```cpp
+   // 一个完整的matrix类
+   #ifndef MATRIX_H_
+   #define MATRIX_H_
+   
+   #include<vector>
+   using namespace std;
+   
+   template<typename Object>
+   
+   class matrix
+   {
+   public:
+       matrix(int rows, int cols): array(rows)
+       {
+           for (auto & thisRow:array)
+               thisRow.1(cols);
+       }
+   
+       matrix(vector<vector<Object>> v): array{v}
+       { }
+       matrix(vector<vector<Object>> && v): array{std::move(v)}
+       { }
+   
+       const vector<Object> & operator[] (int row) const
+       { return array[row];}
+       vector<Object> & operator[] (int row)
+       { return array[row];}
+   
+       int numrows() const
+       {return array.size();}
+       int numcols() const
+       {return numrows()? array[0].size():0;}
+   
+   private:
+       vector<vector<Object>> array;
+   };
+   #endif
+   ```
+
+### 1.7.1  数据成员、构造函数和基本访问函数
+
+1. 矩阵通过array型数据成员来表示，该数据成员被声明为**vector<Object>** 的一个
+
+一个vector类的对象。
+
+2. 构造函数首先把array构造成具有rows个元素，每个元素都是vector<Object>类型对象，而这些对象均是由零参数构造函数构造而得的向量。因此，有rows个零长度的Object的向量
+
+3. 进入构造函数的函数体，每行的大小被调整为有cols个列位置。
+
+### 1.7.2  0perator[ ]
+
+1. operator [ ]的思路：如果有一个矩阵m, 那么m[i]就应该返回对应的matrix m中的第i行的向量。若是这样，则经过正常的vector的下标运算，m[i][j]将给出向量m[i]中位置j上的元素。因此，matrix 的operator[ ] 返回一个vector<Object>类型的实体，而不是Object对象。
+
+2. 返回？
+   
+   ```cpp
+   void copy(const matrix<int> & from, matrix<int> & to)
+   {
+       for (int i = 0; i < to.numrows; ++i);
+           to[i] = from[i];
+   }
+   ```
+
+3. 在copy 函数中，试图将matrix from的每一行复制到matrix to 对应的行上。 operator[ ] 返回一个常量引用，那么to[i]就不能出现在赋值语句的左边。因此返回一个引用。但from[i]=to[i]这样的表达式会编译，即使from是常量矩阵，from[i]也不会是一个常向量。
+
+4. 让operator[ ] 返回一个from的常量引用，而不是to的简单引用。由于成员函数的**定常性（const-ness）** （即一个函数是否是访问函数或是修改函数）是特征的一部分，能够让operator[ ]的访问函数版返回一个常量引用，并让修改函数版返回一个简单的引用。
+
+### 1.7.3  五大函数
+
+这5个函数均可被自动地处理，因为vector已经对其做了处理。
+
+
 
 
