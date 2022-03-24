@@ -61,23 +61,22 @@
    
        vector<int> daysInMonth = {31, 28, 31, 30, 31, 31, 30, 31, 30, 31, 30, 31};
        vector<int> daysInMonth {12};   // C++11给了初始化列表优先权，实际上是在位置0上有唯一一个元素12的大小为1的vector对象
-       vector<int> daysInMonth (12);   // 初始化大小为12的一个vector，必须用圆括号括起来调用填写大小的构造函数
-   ```
-
+       vector<int> daysInMonth (12);   // 初始化大小为12的一个vector，必须用圆
+                                       // 括号括起来调用填写大小的构造函数
        string str1;
        string str2;
        if (str1 == str2) // 两个字符串的值相同，那么就是TRUE
-       {
-           cout << str1.length() << " " << str2.length() << endl;          // length 函数，返回字符串的长度
-       }
-       return 0;
-
+      {
+       cout << str1.length() << " " << str2.length() << endl;          // length 函数，返回字符串的长度
+      }
+      return 0;
    }
+   ```
 
-```
 7. 对数组的基本操作就是用[ ]确定下标。在像数组或vector这样的集合中，依序访问没一个元素的格式是必不可少的操作。C++11在语法中添加了**范围for语句（range for)**
 
 ```cpp
+
 int sum = 0;
 for (int i = 0; i < squares.size(); ++i)
     sum += squares[i];
@@ -209,8 +208,6 @@ for (auto x: squares)
       // 为了使用引用代替复制能够进行传递和返回，在函数声明和返回中是需要语法的。
       ```
 
-
-
 ### 1.5.3  参数传递
 
 1. **传值调用（call-by-value）** —— 把实参复制到形参
@@ -235,8 +232,6 @@ for (auto x: squares)
 
 3. **传引用返回**
 
-
-
 ### 1.5.5 std::swap 和 std::move
 
 1. 存在函数**std::move** 能够把任何左值（或右值）转换成右值。
@@ -252,50 +247,47 @@ for (auto x: squares)
        y = tmp;    
    }
    
-   
    void swap(vector<string> & x, vector<string> & y)
-   {
-       vector<string> tmp = x;
-       x = y;
-       y = tmp;
-   }
+    {
+    vector<string> tmp = x;
+    x = y;
+    y = tmp;
+    }
    
    // 通过3次移动进行交换
-   void swap(vector<string> & x, vector<string> & y)
-   {
-       vector<string> tmp = static_cast<vector<string> && >(x);
-       x = static_cast<vector<string> && > (y);
-       y = static_cast<vector<string> && >(tmp);
-   }
+    void swap(vector<string> & x, vector<string> & y)
+    {
+    vector<string> tmp = static_cast<vector<string> && >(x);
+    x = static_cast<vector<string> && > (y);
+    y = static_cast<vector<string> && >(tmp);
+    }
    
    void swap(vector<string> & x, vector<string> & y)
-   {
-       vector<string> tmp = std::move(x);
-       x = std::move(y);
-       y = std::move(tmp);
-   }
+    {
+    vector<string> tmp = std::move(x);
+    x = std::move(y);
+    y = std::move(tmp);
+    }
    ```
 
-### 1.5.6  五大函数：析构函数、拷贝构造函数、移动构造函数、拷贝复制operator=、移动复制operator=
+   
+
+### 1.5.6 五大函数：析构函数、拷贝构造函数、移动构造函数、拷贝复制operator=、移动复制operator=
 
 1. 析构函数——只要一个对象运行越出范围，或经受一次**delete** ，则析构函数就要被调用。典型情况下，析构函数的唯一责任就是释放掉在对象使用期间获得的资源，包括关于任意的**new** 操作调用对应的**delete** ，关闭任何打开的文件，等等。默认做法是对每个数据成员应用析构函数。
 
 2. 拷贝构造函数和移动构造函数——用来构造一个新的对象，它被初始化为与另一个同样类型对象相同的状态。
-   
-   + 如果这个已存在的对象是一个左值，那么就用拷贝构造函数；
-   
-   + 如果这个已存在的对象是一个右值(即一个迟早要被删除的临时量)，那么就用移动构造函数
-   
-   + 默认情况下，移动构造函数的实现是通过将拷贝构造函数依次应用到每个数据成员来完成。基本类型的数据成员，进行简单的复制即可。
+- 如果这个已存在的对象是一个左值，那么就用拷贝构造函数；
 
+- 如果这个已存在的对象是一个右值(即一个迟早要被删除的临时量)，那么就用移动构造函数
+
+- 默认情况下，移动构造函数的实现是通过将拷贝构造函数依次应用到每个数据成员来完成。基本类型的数据成员，进行简单的复制即可。
 3. 拷贝赋值和移动赋值（operator=）——当=用于两个先前均被构造过的对象时，则调用复制运算符
-   
-   + 如果是一个左值，则可以通过使用拷贝赋值符运算符完成
-   
-   + 如果是一个右值（即一个将要被回收的临时量）,那么可通过移动赋值运算符
-   
-   + 默认时，拷贝赋值运算符是通过依次把拷贝赋值运算符用于每一个数据成员而被实现的
+- 如果是一个左值，则可以通过使用拷贝赋值符运算符完成
 
+- 如果是一个右值（即一个将要被回收的临时量）,那么可通过移动赋值运算符
+
+- 默认时，拷贝赋值运算符是通过依次把拷贝赋值运算符用于每一个数据成员而被实现的
 4. 默认情形——如果一个类由一些数据成员组成，而这些数据成员只是一些基本类型的数据以及对其进行默认处理有意义的对象，那么这个类的默认值通常是有意义的。
 
 5. 浅拷贝（shallow copy)——设该类包含一个数据成员，是个指针。这个指针指向一个动态定址的对象。默认的析构函数无法对这些这震雷削的数据成员起作用（必须delete）。拷贝构造函数和拷贝赋值运算符均复制指针的值而不是指针所指向的对象。则将有两个类实例，都包含指针，而指针又都指向相同的对象
@@ -305,21 +297,22 @@ for (auto x: squares)
 7. 当一个类包含指针作为数据成员时，一般必须自己实现析构函、拷贝赋值和拷贝构造函数。这样做排除了移动的默认情形，因此还必须实现移动复制和移动构造函数
 
 8. 作为一般法则，接受对所有5种操作的默认处理，或声明并显式定义所有5个函数的默认情形（使用关键字default），或每个都不予接受(使用关键字delete)
-   
-   ```cpp
-   // 再次显式地列出拷贝和移动操作
-   ~IntCell()  {cout << "Invoking destructor" << endl;}    // 析构函数
-   IntCell（const IntCell & rhs) = default;                // 拷贝构造函数
-   IntCell(IntCell && rhs) = default;                      // 移动构造函数
-   IntCell & operator = (const IntCell & rhs) =default;    // 拷贝赋值
-   IntCell & operator = ( IntCell && rhs) =default;        // 移动赋值
-   
-   // 不允许对IntCell 对象的所有复制和移动
-   IntCell（const IntCell & rhs) = delete;                // 无拷贝构造函数
-   IntCell(IntCell && rhs) = delete;                      // 无移动构造函数
-   IntCell & operator = (const IntCell & rhs) =delete;    // 无拷贝赋值
-   IntCell & operator = ( IntCell && rhs) =delete;        // 无移动赋值
-   ```
+
+```cpp
+
+// 再次显式地列出拷贝和移动操作
+~IntCell()  {cout << "Invoking destructor" << endl;}    // 析构函数
+IntCell（const IntCell & rhs) = default;                // 拷贝构造函数
+IntCell(IntCell && rhs) = default;                      // 移动构造函数
+IntCell & operator = (const IntCell & rhs) =default;    // 拷贝赋值
+IntCell & operator = ( IntCell && rhs) =default;        // 移动赋值
+
+// 不允许对IntCell 对象的所有复制和移动
+IntCell（const IntCell & rhs) = delete;                // 无拷贝构造函数
+IntCell(IntCell && rhs) = delete;                      // 无移动构造函数
+IntCell & operator = (const IntCell & rhs) =delete;    // 无拷贝赋值
+IntCell & operator = ( IntCell && rhs) =delete;        // 无移动赋值
+```
 
 9. 当默认操作不起作用时，拷贝赋值运算符一般能够通过使用拷贝构造函数创建一个拷贝然后将其与现有的对象交换来实现。移动赋值运算符一般可以通过逐项交换成员来实现
    
@@ -330,7 +323,7 @@ for (auto x: squares)
    public:
        explicit IntCell(int initialValue = 0)
            {storedValue = new int {initialValue};}
-       
+   
        int read() const
        { return * storedValue;}
        void write(int t)
@@ -347,7 +340,7 @@ for (auto x: squares)
    // 为了解决这些问题，实现五大函数
    class IntCell
    {
-    
+   
    public:
        explicit IntCell(int initialValue = 0)
         { storedValue = new int (initialValue);}  
@@ -377,7 +370,7 @@ for (auto x: squares)
        { return *storedValue;}
        void write(int x)
        {*storedValue = x;}
-       
+   
    private:
        int *storedValue;
    };
@@ -426,8 +419,6 @@ delete[] arr2;
    
    6. 为提高速度而必须进行优化的代码段中使用C-style有时候（偶尔）也是需要的
 
-
-
 ## 1.6  模板
 
 将描述类型无关的算法[也称为**泛型算法(generic algorithm)** ]
@@ -460,8 +451,6 @@ delete[] arr2;
 
 4. 如果出现两个同等近似程度的匹配，那么代码非法冰企鹅额编译程序都将二义性
 
-
-
 ### 1.6.2  类模板
 
 1. MemoryCell模板
@@ -482,7 +471,7 @@ delete[] arr2;
    
        const Object & read() const
        { return storedValue;}
-       
+   
        void write(const Object & x)
        { storedValue = x}
    private:
@@ -491,8 +480,6 @@ delete[] arr2;
    // Object 是通过常量引用传递的
    // 构造函数的 默认参数不是0，因为0不可能是一个合理的Object对象
    ```
-
-
 
 ### 1.6.3  Object、Comparable和一个例子
 
@@ -514,29 +501,24 @@ delete[] arr2;
    
        void print(ostream & out = cout) const
        { out << "(square " << getSide() << ")"; }
-       
+   
        bool operator< (const Square & rhs) const
        { return getSide() < rhs.getSide();}
    
    private:
+          double side;
    
-   
-       double side;
    };
-   // 为Square定义一个输出操作符
-   ostream & operator<<(ostream & out, const Square & rhs )
-   {
-       rhs.print(out);
-       return out;
-   }
    
    int main()
    {
-       vector<Square> v = { Square{3.0}, Square{2.0}, Square{2.5}};
-       cout << "Largest square: " << findMax(v) << endl;
-       return 0;
+      vector<Square> v = { Square{3.0}, Square{2.0}, Square{2.5}};
+      cout << "Largest square: " << findMax(v) << endl;
+      return 0;
    }
    ```
+
+  
 
 ### 1.6.4 函数对象
 
@@ -549,78 +531,83 @@ delete[] arr2;
 4. 重写findMax函数来接受两个参数：一个是对象的数组，另一个是解释如何决定两个对象中哪个更大、哪个更小的比较函数
 
 5. 不是使用带有名字的函数，而是使用运算符重载。不是使用作为函数的isLessThan方法，而是使用operator()。其次，当调用operator时，cmp.operator()(x,y)可以简写成cmp(x,y)[换句话说，看起来像是函数调用，因而operator()被称为**函数调用操作符（function call operator）** ]。结果，参数名可以改成更有意义的isLessThan, 而调用则是isLessThan(x,y)。再次，提供一个不用函数对象就能工作的findMax版本，实现用到标准库函数对象模板less(定义于头文件functional中)以生成一个强制使用正常默认顺序的函数对象
-   
-   ```cpp
-   // 泛型findMax, 带有一个函数对象，vector #1
-   // 前提：a.size() > 0
-   template<typename Object, typename Comparator>
-   const Object & findMax(const vector<Object> & arr, Comparator cmp)
-   {
-       int maxIndex = 0;
-   
-       for (int i = 1; i < arr.size(); ++i)
-           if (cmp.isLessThan(arr[maxIndex], arr[i]))
-               maxIndex = i;
-   
-       return arr[maxIndex];
-   } 
-   
-   class CaseInsensitiveCompare
-   {
-   public:
-       bool isLessThan(const string & lhs, const string & rhs) const
-       { return strcasecmp(lhs.c_str(), rhs.c_str())<0;}
-   };
-   
-   int main()
-   {
-       vector<string> arr = {"ZEBRA", "alligator", "crocodile"};
-       cout << findMax(arr, CaseInsensitiveCompare{}) << en
-   dl;
-       
-       return 0;
-   } 
-   
-   // 泛型findMax， 用到一个函数对象，C++风格
-   // 前提：a.size()>0
-   template<typename Object, typename Comparator>
-   const Object & findMax(const vector<Object> & arr, Comparator cmp)
-   {
-       int maxIndex = 0;
-   
-       for (int i = 1; i < arr.size(); ++i)
-           if (isLessThan(arr[maxIndex], arr[i]))
-               maxIndex = i;
-   
-       return arr[maxIndex];
-   } 
-   
-   // 泛型findMax,使用默认的排序
-   #include<functional>
-   template<typename Object>
-   const Object & findMax(const vector<Object> & arr)
-   {
-       return findMax(arr, less<Object>{});
-   }
-   
-   class CaseInsensitiveCompare
-   {
-   public:
-       bool isLessThan(const string & lhs, const string & rhs) const
-       { return strcasecmp(lhs.c_str(), rhs.c_str())<0;
-   
-   };
-   
-   
-   
-   int main()
-   {
-       vector<string> arr = {"ZEBRA", "alligator", "crocodile"};
-       cout << findMax(arr, CaseInsensitiveCompare{}) << endl;
-       cout << findMax(arr) << endl;
-   
-       return 0;
-   }
-   ```
+
+```cpp
+
+```
+
+```cpp
+
+// 泛型findMax, 带有一个函数对象，vector #1
+// 前提：a.size() > 0
+template<typename Object, typename Comparator>
+const Object & findMax(const vector<Object> & arr, Comparator cmp)
+{
+    int maxIndex = 0;
+
+    for (int i = 1; i < arr.size(); ++i)
+        if (cmp.isLessThan(arr[maxIndex], arr[i]))
+            maxIndex = i;
+
+    return arr[maxIndex];
+} 
+
+class CaseInsensitiveCompare
+{
+public:
+    bool isLessThan(const string & lhs, const string & rhs) const
+    { return strcasecmp(lhs.c_str(), rhs.c_str())<0;}
+};
+
+int main()
+{
+    vector<string> arr = {"ZEBRA", "alligator", "crocodile"};
+    cout << findMax(arr, CaseInsensitiveCompare{}) << en
+dl;
+
+    return 0;
+} 
+
+// 泛型findMax， 用到一个函数对象，C++风格
+// 前提：a.size()>0
+template<typename Object, typename Comparator>
+const Object & findMax(const vector<Object> & arr, Comparator cmp)
+{
+    int maxIndex = 0;
+
+    for (int i = 1; i < arr.size(); ++i)
+        if (isLessThan(arr[maxIndex], arr[i]))
+            maxIndex = i;
+
+    return arr[maxIndex];
+} 
+
+// 泛型findMax,使用默认的排序
+#include<functional>
+template<typename Object>
+const Object & findMax(const vector<Object> & arr)
+{
+    return findMax(arr, less<Object>{});
+}
+
+class CaseInsensitiveCompare
+{
+public:
+    bool isLessThan(const string & lhs, const string & rhs) const
+    { return strcasecmp(lhs.c_str(), rhs.c_str())<0;
+
+};
+
+
+
+int main()
+{
+    vector<string> arr = {"ZEBRA", "alligator", "crocodile"};
+    cout << findMax(arr, CaseInsensitiveCompare{}) << endl;
+    cout << findMax(arr) << endl;
+
+    return 0;
+}
+```
 
 
